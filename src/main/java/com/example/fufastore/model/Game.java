@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Lob;
 import jakarta.persistence.Table;
 
 @Entity
@@ -27,11 +28,25 @@ public class Game {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "boolean default true")
     private Boolean status;
 
     @Column(name = "slug", length = 100)
     private String slug;
+
+    @Lob
+    @Column(name = "image")
+    private byte[] image;
+
+    @Column(name = "image_path")
+    private String imagePath;
+
+    @Lob
+    @Column(name = "image_title")
+    private byte[] imageTitle;
+
+    @Column(name = "image_title_path")
+    private String imageTitlePath;
 
     @Column(name = "created_at")
     private Date createdAt;
@@ -101,6 +116,38 @@ public class Game {
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public byte[] getImage() {
+        return image;
+    }
+
+    public void setImage(byte[] image) {
+        this.image = image;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    public byte[] getImageTitle() {
+        return imageTitle;
+    }
+
+    public void setImageTitle(byte[] imageTitle) {
+        this.imageTitle = imageTitle;
+    }
+
+    public String getImageTitlePath() {
+        return imageTitlePath;
+    }
+
+    public void setImageTitlePath(String imageTitlePath) {
+        this.imageTitlePath = imageTitlePath;
     }
 
 }
