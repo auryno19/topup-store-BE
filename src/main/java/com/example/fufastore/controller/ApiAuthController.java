@@ -19,6 +19,7 @@ import com.example.fufastore.repository.UserRepository;
 import com.example.fufastore.util.ApiResponse;
 import com.example.fufastore.util.ResponseUtil;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
@@ -48,7 +49,14 @@ public class ApiAuthController {
                             .withIssuedAt(new Date())
                             .withExpiresAt(new Date(System.currentTimeMillis() + 3600))
                             .sign(Algorithm.HMAC512(jwtConfig.getJwtSecret()));
-                    response.setHeader("Authorization", "Bearer " + token);
+                    // response.setHeader("Authorization", "Bearer " + token);
+
+                    Cookie cookie = new Cookie("token", token);
+                    cookie.setHttpOnly(true);
+                    cookie.setSecure(true);
+                    cookie.setPath("/");
+                    cookie.setMaxAge(3600);
+                    response.addCookie(cookie);
                     return ResponseUtil.generateSuccessResponse("Loggin Success", null);
                 } else {
                     return ResponseUtil.generateErrorResponse("Loggin failed", "Email or password doesnt match");
