@@ -26,4 +26,9 @@ public class ResponseUtil {
         return new ResponseEntity<>(response, status);
     }
 
+    public static <T> ResponseEntity<ApiResponse<T>> generateUnauthorizedResponse(String message) {
+        ApiResponse<T> response = new ApiResponse<T>(false, message, null, null);
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
 }
