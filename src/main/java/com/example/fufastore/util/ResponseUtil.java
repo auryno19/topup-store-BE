@@ -1,5 +1,6 @@
 package com.example.fufastore.util;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -29,6 +30,14 @@ public class ResponseUtil {
     public static <T> ResponseEntity<ApiResponse<T>> generateUnauthorizedResponse(String message) {
         ApiResponse<T> response = new ApiResponse<T>(false, message, null, null);
         return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
+
+    public static <T> ResponseEntity<ApiResponse<T>> generateSuccessResponseWithHeaders(String message, T data,
+            HttpHeaders headers) {
+        ApiResponse<T> response = new ApiResponse<>(true, message, data, null);
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(response);
     }
 
 }

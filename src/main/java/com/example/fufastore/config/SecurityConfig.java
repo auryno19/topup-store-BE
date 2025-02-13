@@ -5,10 +5,10 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
+// import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+// import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -19,7 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.fufastore.service.CustomUserDetailService;
+// import com.example.fufastore.service.CustomUserDetailService;
 
 @Configuration
 @EnableWebSecurity
@@ -28,8 +28,8 @@ public class SecurityConfig {
     @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
-    @Autowired
-    private RoleCheckerFilter roleCheckFilter;
+    // @Autowired
+    // private RoleCheckerFilter roleCheckFilter;
 
     // @Autowired
     // @Lazy
@@ -38,13 +38,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(
-                authorize -> authorize.requestMatchers("/api/game", "/login").permitAll().anyRequest().authenticated())
+                authorize -> authorize.requestMatchers("/api/game", "/api/auth/login").permitAll().anyRequest()
+                        .authenticated())
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         http.addFilterBefore(jwtRequestFilter,
                 UsernamePasswordAuthenticationFilter.class);
-        http.addFilterAfter(roleCheckFilter, JwtRequestFilter.class);
+        // http.addFilterAfter(roleCheckFilter, JwtRequestFilter.class);
         return http.build();
 
     }
@@ -63,6 +64,8 @@ public class SecurityConfig {
                 HttpMethod.POST.name(),
                 HttpMethod.PUT.name()));
         configuration.setMaxAge(3600L);
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "Authorization"));
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
