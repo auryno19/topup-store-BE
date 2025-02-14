@@ -46,6 +46,9 @@ public class Users implements UserDetails {
     @Column(name = "remember_token")
     private String rememberToken;
 
+    @Column(name = "status", columnDefinition = "boolean default true")
+    private Boolean status;
+
     @Column(name = "created_at")
     private Date createdAt;
 
@@ -147,6 +150,14 @@ public class Users implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of((GrantedAuthority) () -> "ROLE_" + role.getName());
+    }
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
     }
 
 }
