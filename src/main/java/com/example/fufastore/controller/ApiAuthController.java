@@ -1,9 +1,11 @@
 package com.example.fufastore.controller;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 // import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,6 +43,17 @@ public class ApiAuthController {
     public ResponseEntity<ApiResponse<Object>> login(@RequestBody Map<String, String> request,
             HttpServletResponse response) {
         try {
+
+            Map<String, String> error = new HashMap<>();
+            if (request.get("email") == "" || request.get("email") == null) {
+                error.put("email", "Email is required");
+            }
+            if (request.get("password") == "" || request.get("password") == null) {
+                error.put("password", "Password is required");
+            }
+            if (error.size() > 0) {
+                return ResponseUtil.generateErrorResponse("Login failed", error, HttpStatus.CONFLICT);
+            }
             Users user = this.userRepository.findByEmail(request.get("email"));
             if (user != null) {
                 if (passwordEncoder.matches(request.get("password"), user.getPassword())) {
