@@ -43,7 +43,8 @@ public class JwtRequestFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
         // System.out.println("JwtRequestFilter is called for: " +
         // request.getRequestURI());
-        if (requestURI.equals("/api/game") || requestURI.equals("/api/auth/login")) {
+        if (requestURI.equals("/api/game") || requestURI.equals("/api/auth/login")
+                || requestURI.equals("/api/auth/register")) {
             // Jika permintaan adalah ke /api/game atau /login, lanjutkan tanpa memeriksa
             // token
             filterChain.doFilter(request, response);

@@ -87,26 +87,38 @@ public class ApiAuthController {
             return ResponseUtil.generateErrorResponse("Loggin failed", e.getMessage());
         }
     }
-    // @RequestMapping("login")
-    // public ResponseEntity<ApiResponse<Object>> login(@RequestBody Map<String,
-    // String> request,
-    // HttpServletResponse response) {
-    // try {
-    // String token = JWT.create()
-    // .withSubject("Auryno dfs")
-    // .withClaim("role", "1")
-    // .withIssuedAt(new Date())
-    // .withExpiresAt(new Date(System.currentTimeMillis() + 3600))
-    // .sign(Algorithm.HMAC512(jwtConfig.getJwtSecret()));
-    // System.out.println("Token: " + token);
-    // HttpHeaders headers = new HttpHeaders();
-    // headers.set("Authorization", "Bearer " + token);
-    // System.out.println(headers);
-    // return ResponseUtil.generateSuccessResponseWithHeaders("Loggin Success",
-    // null, headers);
-    // } catch (Exception e) {
 
-    // return ResponseUtil.generateErrorResponse("Loggin failed", e.getMessage());
-    // }
-    // }
+    @RequestMapping("register")
+    public ResponseEntity<ApiResponse<Object>> register(@RequestBody Users user) {
+        try {
+            Map<String, String> error = new HashMap<>();
+
+            Users userExist = this.userRepository.findByEmail(user.getEmail());
+            if (userExist != null) {
+                error.put("email", "Email already exists");
+            }
+            Users usernameExist = this.userRepository.findByUsername(user.getUsername());
+            if (usernameExist != null) {
+                error.put("username", "Username already exists");
+            }
+            if (user.getEmail() == "" || user.getEmail() == null) {
+                error.put("email", "Email is required");
+            }
+            if (user.getPassword() == "" || user.getPassword() == null) {
+                error.put("password", "Password is required");
+            }
+            if (user.getUsername() == "" || user.getUsername() == null) {
+                error.put("username", "Username is required");
+            }
+            if (error.size() > 0) {
+                return ResponseUtil.generateErrorResponse("Register failed", error, HttpStatus.CONFLICT);
+            }
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            this.userRepository.save(user);
+            return ResponseUtil.generateSuccessResponse("Register Success", null);
+        } catch (Exception e) {
+            return ResponseUtil.generateErrorResponse("Register failed", e.getMessage());
+        }
+    }
+
 }

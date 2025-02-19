@@ -13,4 +13,11 @@ public interface UserRepository extends JpaRepository<Users, Long> {
             LIMIT 1
             """, nativeQuery = true)
     Users findByEmail(String email);
+
+    @Query(value = """
+            SELECT * FROM users
+            WHERE username = ?1
+            LIMIT 1
+            """, nativeQuery = true)
+    Users findByUsername(String username);
 }
