@@ -1,10 +1,14 @@
 package com.example.fufastore.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.autoconfigure.security.SecurityProperties.User;
 import org.springframework.http.HttpStatus;
 // import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -89,36 +93,96 @@ public class ApiAuthController {
     }
 
     @RequestMapping("register")
-    public ResponseEntity<ApiResponse<Object>> register(@RequestBody Users user) {
+    public ResponseEntity<ApiResponse<Object>> register(@RequestBody Map<String, String> request) {
         try {
             Map<String, String> error = new HashMap<>();
-
-            Users userExist = this.userRepository.findByEmail(user.getEmail());
+            Users userExist = this.userRepository.findByEmail(request.get("email"));
             if (userExist != null) {
                 error.put("email", "Email already exists");
             }
-            Users usernameExist = this.userRepository.findByUsername(user.getUsername());
+            if (!Pattern.matches("[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", request.get("email"))) {
+                error.put("email", "Email Format incorrect");
+            }
+            if (request.get("email") == "" || request.get("email") == null) {
+                error.put("email", "Email is required");
+            }
+            Users usernameExist = this.userRepository.findByUsername(request.get("username"));
             if (usernameExist != null) {
                 error.put("username", "Username already exists");
             }
-            if (user.getEmail() == "" || user.getEmail() == null) {
-                error.put("email", "Email is required");
-            }
-            if (user.getPassword() == "" || user.getPassword() == null) {
-                error.put("password", "Password is required");
-            }
-            if (user.getUsername() == "" || user.getUsername() == null) {
+            if (request.get("username") == "" || request.get("username") == null) {
                 error.put("username", "Username is required");
             }
+
+            List<String> validatePassword = passwordCheker(request.get("password"));
+            if (validatePassword.size() > 0) {
+                error.put("password", validatePassword.toString());
+            }
+            if (request.get("password") == "" || request.get("password") == null) {
+                error.put("password", "Password is required");
+            }
+            if (!request.get("passwordConfirmation").equals(request.get("password"))) {
+                error.put("passwordConfirmation", "Password Confirmation doesn't match");
+            }
+            if (request.get("passwordConfirmation") == "" || request.get("passwordConfirmation") == null) {
+                error.put("passwordConfirmation", "Password Confirmation is required");
+            }
+
             if (error.size() > 0) {
                 return ResponseUtil.generateErrorResponse("Register failed", error, HttpStatus.CONFLICT);
             }
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            Users user = new Users();
+            user.setEmail(request.get("email"));
+            user.setUsername(request.get("username"));
+            user.setCreatedAt(new Date());
+            user.setPassword(passwordEncoder.encode(request.get("password")));
             this.userRepository.save(user);
             return ResponseUtil.generateSuccessResponse("Register Success", null);
         } catch (Exception e) {
             return ResponseUtil.generateErrorResponse("Register failed", e.getMessage());
         }
+    }
+
+    private static List<String> passwordCheker(String str) {
+        List<String> validatePassword = new ArrayList<>();
+
+        if (str.length() < 8) {
+            validatePassword.add("Password must be at least 8 characters long");
+        }
+        boolean isupper = false;
+        boolean islower = false;
+        boolean isnumeric = false;
+        boolean isspecial = false;
+
+        for (char charStr : str.toCharArray()) {
+            if (Character.isUpperCase(charStr)) {
+                isupper = true;
+            }
+            if (Character.isLowerCase(charStr)) {
+                islower = true;
+            }
+            if (Character.isDigit(charStr)) {
+                isnumeric = true;
+            }
+            if (Pattern.matches("[^a-zA-Z0-9]", String.valueOf(charStr))) {
+                isspecial = true;
+            }
+        }
+
+        if (!isupper) {
+            validatePassword.add("Password must be contain uppercase");
+        }
+        if (!islower) {
+            validatePassword.add("Password must be contain lowercase");
+        }
+        if (!isnumeric) {
+            validatePassword.add("Password must be contain number");
+        }
+        if (!isspecial) {
+            validatePassword.add("Password must be contain special character");
+        }
+
+        return validatePassword;
     }
 
 }
