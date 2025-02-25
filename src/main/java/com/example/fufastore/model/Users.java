@@ -160,4 +160,9 @@ public class Users implements UserDetails {
         this.status = status;
     }
 
+    public UserDetails map(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'map'");
+    }
+
 }

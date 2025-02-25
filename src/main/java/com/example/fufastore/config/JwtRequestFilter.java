@@ -41,6 +41,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String requestURI = request.getRequestURI();
+        System.out.println("filter 1");
         // System.out.println("JwtRequestFilter is called for: " +
         // request.getRequestURI());
         if (requestURI.equals("/api/game") || requestURI.equals("/api/auth/login")
