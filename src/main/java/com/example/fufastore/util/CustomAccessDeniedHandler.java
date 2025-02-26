@@ -17,6 +17,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.getWriter()
-                .write("{\"error\": \"Access Denied: You do not have permission to access this resource\"}");
+                .write("{\"error\": \"Access Denied: You do not have permission to access this resource\",\"message\": \"Access Denied: You do not have permission to access this resource\"}");
     }
 }

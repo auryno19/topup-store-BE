@@ -11,7 +11,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.util.WebUtils;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -20,7 +22,7 @@ import com.auth0.jwt.interfaces.JWTVerifier;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-// import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -40,33 +42,33 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String requestURI = request.getRequestURI();
-        System.out.println("filter 1");
+        // String requestURI = request.getRequestURI();
+        // System.out.println("filter 1");
         // System.out.println("JwtRequestFilter is called for: " +
         // request.getRequestURI());
-        if (requestURI.equals("/api/game") || requestURI.equals("/api/auth/login")
-                || requestURI.equals("/api/auth/register")) {
-            // Jika permintaan adalah ke /api/game atau /login, lanjutkan tanpa memeriksa
-            // token
-            filterChain.doFilter(request, response);
-            return;
+        // if (requestURI.equals("/api/game") || requestURI.equals("/api/auth/login")
+        // || requestURI.equals("/api/auth/register")) {
+        // filterChain.doFilter(request, response);
+        // return;
+        // }
+        // String authorizationHeader = request.getHeader("Authorization");
+        Cookie[] cookies = request.getCookies();
+        String token = null;
+        System.out.println(cookies);
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("token")) {
+                    token = cookie.getValue();
+                    break;
+                }
+            }
         }
-        String authorizationHeader = request.getHeader("Authorization");
-        // Cookie[] cookies = request.getCookies();
-        // String token = null;
-
-        // if (cookies != null) {
-        // for (Cookie cookie : cookies) {
-        // if (cookie.getName().equals("token")) {
-        // token = cookie.getValue();
-        // break;
-        // }
-        // }
-        // }
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
-            // if (token != null) {
+        System.out.println(token);
+        // if (authorizationHeader != null && authorizationHeader.startsWith("Bearer "))
+        // {
+        // String token = authorizationHeader.substring(7);
+        if (token != null) {
 
             try {
                 JWTVerifier verifier = JWT.require(Algorithm.HMAC512(jwtSecret)).build();
@@ -83,11 +85,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 response.getWriter().write("Token tidak valid atau kedaluwarsa");
                 return;
             }
-        } else {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
-            response.getWriter().write("Header Authorization tidak ditemukan");
-            return;
         }
+        // else {
+        // response.setStatus(HttpStatus.UNAUTHORIZED.value());
+        // response.getWriter().write("Header Authorization tidak ditemukan");
+        // return;
+        // }
 
         filterChain.doFilter(request, response);
     }
