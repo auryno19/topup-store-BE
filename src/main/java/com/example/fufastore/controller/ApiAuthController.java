@@ -134,6 +134,7 @@ public class ApiAuthController {
             Users user = new Users();
             user.setEmail(request.get("email"));
             user.setUsername(request.get("username"));
+            user.setStatus(true);
             user.setCreatedAt(new Date());
             user.setPassword(passwordEncoder.encode(request.get("password")));
             this.userRepository.save(user);
