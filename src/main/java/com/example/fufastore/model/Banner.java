@@ -1,5 +1,6 @@
 package com.example.fufastore.model;
 
+import java.util.Base64;
 import java.util.Date;
 
 import jakarta.persistence.Column;
@@ -29,6 +30,17 @@ public class Banner {
     @Column(name = "updated_at")
     private Date updatedAt;
 
+    @Column(name = "status", columnDefinition = "boolean default true")
+    private Boolean status;
+
+    public Boolean getStatus() {
+        return status;
+    }
+
+    public void setStatus(Boolean status) {
+        this.status = status;
+    }
+
     public Long getId() {
         return id;
     }
@@ -37,8 +49,11 @@ public class Banner {
         this.id = id;
     }
 
-    public byte[] getImage() {
-        return image;
+    public String getImage() {
+        if (image != null) {
+            return Base64.getEncoder().encodeToString(image);
+        }
+        return null;
     }
 
     public void setImage(byte[] image) {
