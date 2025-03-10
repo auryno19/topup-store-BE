@@ -19,6 +19,7 @@ public interface BannerRepository extends JpaRepository<Banner, Long> {
         @Query(value = """
                         SELECT * From banner
                         WHERE status = TRUE
+                        ORDER BY id
                         """, nativeQuery = true)
         List<Banner> findIsActive();
 

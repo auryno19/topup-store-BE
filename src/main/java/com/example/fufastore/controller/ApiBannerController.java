@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -65,8 +66,24 @@ public class ApiBannerController {
         }
     }
 
+    @Transactional
+    @GetMapping("get/{id}")
+    public ResponseEntity<ApiResponse<Object>> getId(@PathVariable("id") Long id) {
+        try {
+            Banner banner = bannerRepository.findById(id).orElse(null);
+            if (banner == null) {
+                return ResponseUtil.generateSuccessResponse("Banner not found.", null);
+            }
+
+            return ResponseUtil.generateSuccessResponse("Banner retrieved successfully", banner);
+        } catch (Exception e) {
+            return ResponseUtil.generateErrorResponse("Retrieved banner failed", e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @PutMapping("edit")
-    public ResponseEntity<ApiResponse<Object>> editBanner(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ApiResponse<Object>> editBanner2(@RequestParam("file") MultipartFile file) {
         try {
             Banner banner = bannerRepository.findBanner();
             if (banner == null) {
@@ -101,4 +118,46 @@ public class ApiBannerController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("edit/{id}")
+    public ResponseEntity<ApiResponse<Object>> editBanner(@RequestParam("file") MultipartFile file,
+            @PathVariable("id") Long id) {
+        try {
+            if (id != null) {
+                Banner banner = bannerRepository.findById(id).orElse(null);
+                if (banner != null) {
+                    banner.setUpdatedAt(new Date());
+                    banner.setImage(file.getBytes());
+                    this.bannerRepository.save(banner);
+                    return ResponseUtil.generateSuccessResponse("Edit Banner success", null);
+                }
+            }
+            return ResponseUtil.generateSuccessResponse("Banner not found.", null,
+                    HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ResponseUtil.generateErrorResponse("Edit Banner failed", e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PutMapping("delete/{id}")
+    public ResponseEntity<ApiResponse<Object>> deleteBanner(@PathVariable("id") Long id) {
+        try {
+            if (id != null) {
+                Banner banner = bannerRepository.findById(id).orElse(null);
+                if (banner != null) {
+                    banner.setUpdatedAt(new Date());
+                    banner.setStatus(false);
+                    this.bannerRepository.save(banner);
+                    return ResponseUtil.generateSuccessResponse("delete Banner success", null);
+                }
+            }
+            return ResponseUtil.generateSuccessResponse("Banner not found.", null,
+                    HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return ResponseUtil.generateErrorResponse("Delete Banner failed", e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
