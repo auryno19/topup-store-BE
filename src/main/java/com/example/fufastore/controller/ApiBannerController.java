@@ -112,7 +112,7 @@ public class ApiBannerController {
             newBanner.setImage(file.getBytes());
             newBanner.setStatus(true);
             this.bannerRepository.save(newBanner);
-            return ResponseUtil.generateSuccessResponse("Upload Banner success", null);
+            return ResponseUtil.generateSuccessResponse("Upload Banner success", null, HttpStatus.CREATED);
         } catch (Exception e) {
             return ResponseUtil.generateErrorResponse("Edit Banner failed", e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
