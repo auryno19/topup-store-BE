@@ -57,7 +57,7 @@ public class SecurityConfig {
                 http.authorizeHttpRequests(
                                 authorize -> authorize
                                                 .requestMatchers("/api/game", "api/banner").permitAll()
-                                                .requestMatchers("/api/banner/*")
+                                                .requestMatchers("/api/banner/*", "/api/game/*")
                                                 .hasRole("Admin")
                                                 .requestMatchers("/api/auth/login", "/api/auth/register")
                                                 .permitAll().anyRequest()
